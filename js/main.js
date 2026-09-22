@@ -175,10 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateActiveNav();
     }
 
-    // Preserve previously shared InnovaClub section links.
-    if (isHomepage && location.hash === '#innova') {
-        history.replaceState(null, '', location.pathname + location.search + '#innovaclub');
-    }
     const initialTarget = document.getElementById(location.hash.slice(1));
     const initializeNavigation = () => {
         initialTarget?.scrollIntoView({ behavior: 'instant', block: 'start' });

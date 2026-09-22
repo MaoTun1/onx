@@ -2018,7 +2018,7 @@ main > .section-padding > .team-grid {
     grid-column: 1 / -1;
   }
 
-  /* InnovaClub Stages & Roles (innova.html / en-innova.html) */
+  /* InnovaClub Stages & Roles (innovaclub.html / en-innovaclub.html) */
   main > .section-padding > .section-divider {
     display: grid;
     grid-template-columns: minmax(min-content, 0.32fr) minmax(0, 1fr);
