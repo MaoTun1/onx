@@ -1,6 +1,11 @@
 // js/main.js
 
-document.addEventListener('DOMContentLoaded', async () => {
+// Keep direct index.html requests on the same clean URL as normal navigation.
+if (location.pathname.endsWith('/index.html')) {
+    history.replaceState(null, '', location.pathname.slice(0, -10) + location.search + location.hash);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.site-header');
     const menuButton = document.querySelector('.menu-toggle');
 
@@ -23,54 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    const pageSections = document.querySelector('#page-sections');
-    const hasInitialHash = Boolean(location.hash && location.hash.length > 1);
-
-    if (pageSections && hasInitialHash) {
-        document.body.style.opacity = '0';
-    }
-
-    if (pageSections) {
-        try {
-            const sections = document.createDocumentFragment();
-            const prefix = document.documentElement.lang === 'en' ? 'en-' : '';
-            const pages = await Promise.all(
-                ['fund.html', 'network.html', 'innova.html', 'team.html']
-                    .map(page => `${prefix}${page}`)
-                    .map(page => fetch(page).then(response => {
-                        if (!response.ok) throw new Error(`Could not load ${page}`);
-                        return response.text();
-                    }))
-            );
-            const parser = new DOMParser();
-            pages.forEach(html => {
-                parser.parseFromString(html, 'text/html')
-                    .querySelectorAll('main > section:not(#iletisim):not(#contact)')
-                    .forEach(section => sections.append(document.importNode(section, true)));
-            });
-            pageSections.replaceWith(sections);
-
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-
-            if (hasInitialHash) {
-                const targetId = location.hash.slice(1);
-                const targetEl = document.getElementById(targetId);
-                if (targetEl) {
-                    targetEl.scrollIntoView({ behavior: 'auto', block: 'start' });
-                }
-                requestAnimationFrame(() => {
-                    document.body.style.transition = 'opacity 0.2s ease-in-out';
-                    document.body.style.opacity = '1';
-                });
-            }
-        } catch (error) {
-            pageSections.innerHTML = `<p class="section-load-error">${document.documentElement.lang === 'en' ? 'Content could not be loaded. Please refresh the page.' : 'İçerik yüklenemedi. Lütfen sayfayı yenileyin.'}</p>`;
-            console.error(error);
-            document.body.style.opacity = '1';
-        }
-    }
+    const isHomepage = Boolean(document.querySelector('main[data-homepage]'));
 
     if (menuButton && header) {
         menuButton.addEventListener('click', () => {
@@ -111,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         dropdown.querySelectorAll('.lang-dropdown-menu a').forEach(link => {
             link.addEventListener('click', () => {
-                if (!pageSections) return;
+                if (!isHomepage) return;
                 const validSectionIds = ['top', 'fund', 'yaklasim', 'approach', 'odak', 'focus', 'network', 'innova', 'komite', 'ekip', 'iletisim', 'contact'];
                 const focusPoint = window.innerHeight * 0.35;
                 const section = validSectionIds
@@ -149,15 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (href.includes('#')) {
                 return href.split('#')[1];
             }
-            const pageMap = {
-                'index.html': 'top', 'en.html': 'top',
-                'fund.html': 'fund', 'en-fund.html': 'fund',
-                'network.html': 'network', 'en-network.html': 'network',
-                'innova.html': 'innova', 'en-innova.html': 'innova',
-                'team.html': 'komite', 'en-team.html': 'komite'
-            };
-            const filename = href.split('/').pop();
-            return pageMap[filename] || null;
+            return href === '/' || href === '/en/' ? 'top' : null;
         };
 
         const getSections = () => validSectionIds
@@ -225,7 +175,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateActiveNav();
     }
 
-    initScrollSpy();
+    const initialTarget = document.getElementById(location.hash.slice(1));
+    const initializeNavigation = () => {
+        initialTarget?.scrollIntoView({ behavior: 'instant', block: 'start' });
+        initScrollSpy();
+    };
+    if (document.readyState === 'complete') {
+        initializeNavigation();
+    } else {
+        window.addEventListener('load', initializeNavigation, { once: true });
+    }
 
     // Scroll state for logo animation
     window.addEventListener('scroll', () => {
