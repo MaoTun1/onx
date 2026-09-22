@@ -65,12 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
             odak: 'focus', focus: 'odak',
             iletisim: 'contact', contact: 'iletisim',
             top: 'top', fund: 'fund', network: 'network',
-            innova: 'innova', komite: 'komite', ekip: 'ekip'
+            innovaclub: 'innovaclub', komite: 'komite', ekip: 'ekip'
         };
         dropdown.querySelectorAll('.lang-dropdown-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 if (!isHomepage) return;
-                const validSectionIds = ['top', 'fund', 'yaklasim', 'approach', 'odak', 'focus', 'network', 'innova', 'komite', 'ekip', 'iletisim', 'contact'];
+                const validSectionIds = ['top', 'fund', 'yaklasim', 'approach', 'odak', 'focus', 'network', 'innovaclub', 'komite', 'ekip', 'iletisim', 'contact'];
                 const focusPoint = window.innerHeight * 0.35;
                 const section = validSectionIds
                     .map(id => document.getElementById(id))
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ScrollSpy & Section Scroll Calculations
     function initScrollSpy() {
         const navLinks = [...document.querySelectorAll('.main-nav a')];
-        const validSectionIds = ['top', 'fund', 'yaklasim', 'approach', 'odak', 'focus', 'network', 'innova', 'komite', 'ekip', 'iletisim', 'contact'];
+        const validSectionIds = ['top', 'fund', 'yaklasim', 'approach', 'odak', 'focus', 'network', 'innovaclub', 'komite', 'ekip', 'iletisim', 'contact'];
         
         const getTargetSectionId = (link) => {
             const href = link.getAttribute('href') || '';
@@ -175,6 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateActiveNav();
     }
 
+    // Preserve previously shared InnovaClub section links.
+    if (isHomepage && location.hash === '#innova') {
+        history.replaceState(null, '', location.pathname + location.search + '#innovaclub');
+    }
     const initialTarget = document.getElementById(location.hash.slice(1));
     const initializeNavigation = () => {
         initialTarget?.scrollIntoView({ behavior: 'instant', block: 'start' });
